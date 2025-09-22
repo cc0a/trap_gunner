@@ -1,4 +1,4 @@
-The purpose of this project is to provide security researchers with a simple, affordable means to test their LAN by having an implant dial out to C2 as soon as the device is plugged in.
+The purpose of this project is to provide security researchers with a simple, affordable means to test a LAN by having an implant dial out to C2 as soon as the device is plugged in.
 
 This can be done with any Raspberry Pi device, and it is recommended to install Kali OS for the sake of convenience. This script is created under the assumption that you have already connected to your RPi via SSH and currently have an active session so that configuring the RPi will take place after the C2 instance is spun up in AWS and the IP is fetched. 
 
