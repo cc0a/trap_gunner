@@ -45,7 +45,7 @@ locals {
   subnet_id = data.aws_subnets.default.ids[0]
 }
 
-# Security group allowing SSH from your IP
+# Security group allowing SSH from your IP address
 resource "aws_security_group" "ssh" {
   name        = "allow_ssh_from_client"
   description = "Allow SSH"
