@@ -32,22 +32,37 @@ scp -i "$LOCAL_KEY" "$LOCAL_KEY" "$PI_USER@$PI_HOST:$REMOTE_KEY_PATH"
 ssh "$PI_USER@$PI_HOST" "chmod 600 $REMOTE_KEY_PATH"
 
 # ----------------------------
-# Enable SSH and configure UFW
-# ----------------------------
-echo "Enabling SSH service and allowing through UFW..."
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Enabling SSH and configuring firewall on remote Pi..."
+
 ssh "$PI_USER@$PI_HOST" <<'EOF'
-# Enable SSH service
+set -euo pipefail
+
+echo "🔧 Enabling SSH service..."
 sudo systemctl enable ssh
 sudo systemctl start ssh
 
-# Ensure UFW is installed
+echo "🔒 Installing and configuring UFW..."
 if ! command -v ufw &>/dev/null; then
-    sudo apt-get update && sudo apt-get install -y ufw
+    sudo apt-get update -y
+    sudo apt-get install -y ufw
 fi
 
-# Allow SSH through the firewall
-sudo ufw allow 22/tcp
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp comment 'Allow SSH'
+sudo ufw limit 22/tcp comment 'Rate-limit SSH'
 sudo ufw --force enable
+
+echo "🚫 Hardening SSH configuration..."
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo systemctl reload ssh
+
+echo "✅ SSH and UFW setup complete!"
+sudo ufw status verbose
 EOF
 
 echo "Deployment complete!"
